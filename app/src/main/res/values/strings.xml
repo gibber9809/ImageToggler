@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">ImageToggler</string>
+    <string name="counter_message">No clicks yet</string>
+    <string name="counter_button">Register a click</string>
+    <string name="toggle_button">Toggle Image</string>
+    <string name="reset_button">Reset</string>
+</resources>
