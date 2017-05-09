@@ -12,8 +12,10 @@ import android.widget.TextView;
 public class MainActivity extends AppCompatActivity {
     private static final String TIMES_CLICKED_KEY = "TIMES_CLICKED_KEY";
     private static final String DISPLAY_IMAGE_KEY = "DISPLAY_IMAGE_KEY";
-    private int timesClicked;
-    private boolean displayImage;
+    private int mTimesClicked = 0;
+    private boolean mDisplayImage = false;
+    private TextView mClickCounterView = null;
+    private ImageView mImage = null;
 
     /**Override to load main activity and saved instance information */
     @Override
@@ -21,12 +23,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState == null) {
-            timesClicked = 0;
-            displayImage = false;
-        } else {
-            timesClicked =(int) savedInstanceState.getSerializable(TIMES_CLICKED_KEY);
-            displayImage =(boolean) savedInstanceState.getSerializable(DISPLAY_IMAGE_KEY);
+        if (savedInstanceState != null){
+            mTimesClicked = savedInstanceState.getInt(TIMES_CLICKED_KEY);
+            mDisplayImage = savedInstanceState.getBoolean(DISPLAY_IMAGE_KEY);
 
             setClickCountText();
             setToggleImageVisibility();
@@ -45,8 +44,8 @@ public class MainActivity extends AppCompatActivity {
     /**Override to save private variables  */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
-        outState.putSerializable(TIMES_CLICKED_KEY, timesClicked);
-        outState.putSerializable(DISPLAY_IMAGE_KEY, displayImage);
+        outState.putInt(TIMES_CLICKED_KEY, mTimesClicked);
+        outState.putBoolean(DISPLAY_IMAGE_KEY, mDisplayImage);
 
         super.onSaveInstanceState(outState);
     }
@@ -65,38 +64,52 @@ public class MainActivity extends AppCompatActivity {
 
     /**Counts clicks made on Register a click button */
     public void countClick(View view) {
-        timesClicked += 1;
+        mTimesClicked += 1;
         setClickCountText();
     }
 
     /**Called when toggle image button clicked*/
     public void toggleImage(View view) {
-        displayImage = !displayImage;//or maybe I can do something with the view in which I display the image
+        mDisplayImage = !mDisplayImage;//or maybe I can do something with the view in which I display the image
         setToggleImageVisibility();
     }
 
+    /**Getter method for the view containing the image */
+    public ImageView getImageView() {
+        if (mImage == null)
+            mImage = (ImageView) findViewById(R.id.imageView);
+        return mImage;
+    }
+
+    /**Getter method for the view containing the click counting text */
+    public TextView getClickCounterView() {
+        if (mClickCounterView == null)
+            mClickCounterView =(TextView) findViewById(R.id.textView);
+        return mClickCounterView;
+    }
+
     /**Called when reset button clicked */
-    public void reset() {
-        timesClicked = 0;
-        displayImage = false;
+    private void reset() {
+        mTimesClicked = 0;
+        mDisplayImage = false;
         setClickCountText();
         setToggleImageVisibility();
     }
 
     /**Method to set value of click counting text */
     private void setClickCountText() {
-        TextView clickCounterView = (TextView) findViewById(R.id.textView);
-        if (timesClicked == 0) {
-            clickCounterView.setText(getResources().getString(R.string.counter_message));
-        } else {
-            clickCounterView.setText("Clicked " + String.valueOf(timesClicked) + " times.");
+        TextView clickCounterView = getClickCounterView();
+            if (mTimesClicked == 0) {
+                clickCounterView.setText(R.string.counter_message);
+            } else {
+                clickCounterView.setText(String.format(getString(R.string.counter_text_format), mTimesClicked));
         }
     }
 
     /**Method to set visibiliy of togglable image */
     private void setToggleImageVisibility() {
-        ImageView image = (ImageView) findViewById(R.id.imageView);
-        if (displayImage)
+        ImageView image = getImageView();
+        if (mDisplayImage)
             image.setVisibility(View.VISIBLE);
         else
             image.setVisibility(View.INVISIBLE);
